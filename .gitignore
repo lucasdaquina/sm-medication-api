@@ -5,3 +5,8 @@
 /.vs
 /src/SM.Medication.Api/obj
 /tests/SM.Medication.Api.Tests/obj
+/src/SM.Medication.Api/bin/Debug/net8.0
+/src/SM.Medication.Auth/bin/Debug/net8.0
+/src/SM.Medication.Auth/obj
+/src/SM.Medication.Shared/bin/Debug/net8.0
+/src/SM.Medication.Shared/obj
