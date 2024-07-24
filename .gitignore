@@ -3,6 +3,5 @@
 ################################################################################
 
 /.vs
-/build
 /src/SM.Medication.Api/obj
 /tests/SM.Medication.Api.Tests/obj
