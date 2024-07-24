@@ -1,0 +1,27 @@
+parameters:
+  - name: buildConfiguration
+    type: string
+  - name: solutionPath
+    type: string
+  - name: dotnetSdkVersion
+    type: string
+
+variables:
+- template: vars/vars-global.yaml
+
+stages:
+- stage: Build
+  jobs:
+    - job: Build
+      pool:
+        BuildAgent
+      variables:
+        buildConfiguration: ${{ parameters.buildConfiguration }}
+        dotnetSdkVersion: ${{ parameters.dotnetSdkVersion }}
+        projectPath: ${{ parameters.solutionPath }}
+        solutionPath: ${{ parameters.solutionPath }}
+      steps:
+        - template: stages/dotnet-build.yaml
+          parameters:
+            enableLinter: true
+            semVer: false

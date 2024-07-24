@@ -1,0 +1,26 @@
+name: $(Build.Repository.Name)-$(Date:yyyyMMdd)$(Rev:.r)-pr
+
+trigger: none
+
+pr:
+  autoCancel: true
+  branches:
+      include:
+      - '*'
+  paths:
+    include:
+      - src/*
+      - tests/*
+    exclude:
+      - docs/*
+      - build/*
+      - resources/*
+      - .vscode/*
+      - README.md
+
+extends:
+  template: '/templates/dotnet-app-pr.yaml@templates'
+  parameters:
+    buildConfiguration: 'Release'
+    solutionPath: '*.sln'
+    dotnetSdkVersion: '8.x'

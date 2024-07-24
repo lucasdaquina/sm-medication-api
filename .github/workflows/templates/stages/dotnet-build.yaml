@@ -1,0 +1,116 @@
+parameters:
+  - name: enableLinter
+    type: boolean
+    default: true
+  - name: semVer
+    type: boolean
+    default: true
+  - name: buildSteps
+    type: stepList
+    default: []
+  - name: feedId
+    type: string
+    default: ''
+
+steps:
+- ${{ if eq(parameters.semVer, true) }}:
+  - task: gitversion/setup@0
+    displayName: Install GitVersion
+    inputs:
+      versionSpec: '5.10.3'
+
+  - task: gitversion/execute@0
+    displayName: Determine Version
+    inputs:
+      useConfigFile: true
+      configFilePath: './GitVersion.yaml'
+
+  - script: echo current version is $(GitVersion.SemVer)
+    displayName: 'Display calculated version'
+
+  - task: Bash@3
+    displayName: 'Update build number'
+    inputs:
+      targetType: inline
+      script: echo "##vso[build.updatebuildnumber]$(SemVer)"
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetSdkVersion)'
+    includePreviewVersions: false
+  displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetAuthenticate@1
+
+- ${{ if not(eq(parameters.feedId, '')) }}:
+    - task: NuGetCommand@2
+      displayName: 'Restore nuget'
+      inputs:
+        command: 'restore'
+        restoreSolution: '$(solutionPath)'
+        feedsToUse: 'select'
+        vstsFeed: '$(feedId)'
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solutionPath)'
+    feedsToUse: 'config'
+    nugetConfigPath: 'nuget.config'
+    externalFeedCredentials: ''
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    feedsToUse: 'config'
+    projects: '$(solutionPath)'
+    nugetConfigPath: nuget.config
+    displayName: 'Restore Dotnet Core'
+
+- ${{ if eq(parameters.enableLinter, true) }}:
+  - task: DotNetCoreCLI@2
+    displayName: 'Lint whitespace'
+    inputs:
+      command: 'custom'
+      custom: 'format'
+      arguments: 'whitespace --no-restore --verify-no-changes --verbosity diagnostic'
+      projects: '$(projectPath)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Lint style'
+    inputs:
+      command: 'custom'
+      custom: 'format'
+      arguments: 'style --no-restore --verify-no-changes --verbosity diagnostic'
+      projects: '$(projectPath)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Lint analyzers'
+    inputs:
+      command: 'custom'
+      custom: 'format'
+      arguments: 'analyzers --no-restore --verify-no-changes --verbosity diagnostic'
+      projects: '$(projectPath)'
+
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: '--no-restore --configuration $(buildConfiguration)'
+    projects: '$(projectPath)'
+  displayName: 'Build App - $(buildConfiguration)'
+  condition: succeeded()
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '$(solutionPath)'
+    arguments: '--filter Category!=Integration'
+  displayName: 'Run tests'
+  condition: succeeded()
+
+- ${{ each step in parameters.buildSteps }}:
+  - ${{ each pair in step }}:
+      ${{ pair.key }}: ${{ pair.value }}
