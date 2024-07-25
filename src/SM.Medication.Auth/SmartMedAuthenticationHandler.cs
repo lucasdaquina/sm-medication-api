@@ -58,8 +58,9 @@ public class SmartMedAuthenticationHandler(
 
         //Validation should be done on the DB, using MedicalOptions to have access to connectionString, to return if token is valid or not
         //Or some checksum, or any type of validation
-        //For now, we are just checking if the token is not empty
-        if (string.IsNullOrWhiteSpace(tokenModel.Token))
+        //For now, we are just checking if the token and the role is not empty
+        if (string.IsNullOrWhiteSpace(tokenModel.Token) ||
+            string.IsNullOrWhiteSpace(tokenModel.Role))
         {
             return await ProcessAuthFailure("The Token is not valid.");
         }
