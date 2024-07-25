@@ -1,4 +1,4 @@
-﻿namespace SmartMed.Medication.Auth.Constants;
+namespace SmartMed.Medication.Auth.Constants;
 
 public class AuthSchemeConstants
 {
@@ -7,4 +7,6 @@ public class AuthSchemeConstants
     public const string SmartMedToken = "SmartMed (?<token>.*)";
 
     public const string SmartMedAuthFailureHeader = "SmartMedAuthFailure";
+
+    public const string DefaultAuthFailureMessage = "Auth failed.";
 }
