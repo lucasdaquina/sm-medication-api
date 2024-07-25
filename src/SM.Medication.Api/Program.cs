@@ -20,16 +20,12 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.MapGet("/",
-    [SwaggerOperation(
-        Summary = "Home",
-        Description = "Base Get Endpoint")]
-    [SwaggerResponse(200, "Success!")]
-    [SwaggerResponse(401, "You're not Authorized!")]
-    [SwaggerResponse(500, "Failed!")]
-    () 
-        => "Hello World!")
+app.MapGet("/", () => "Hello World!")
     .WithTags("Home")
+    .WithMetadata(new SwaggerOperationAttribute("Home", "Base Get Endpoint"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status200OK, "Success!"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status401Unauthorized, "You're not Authorized!"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status500InternalServerError, "Failed!"))
     .RequireAuthorization();
 
 if (app.Environment.IsDevelopment())
