@@ -22,13 +22,15 @@ var app = builder.Build();
 
 app.MapGet("/",
     [SwaggerOperation(
-        Summary = "Base Get",
+        Summary = "Home",
         Description = "Base Get Endpoint")]
     [SwaggerResponse(200, "Success!")]
     [SwaggerResponse(401, "You're not Authorized!")]
     [SwaggerResponse(500, "Failed!")]
     () 
-        => "Hello World!").RequireAuthorization();
+        => "Hello World!")
+    .WithTags("Home")
+    .RequireAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
