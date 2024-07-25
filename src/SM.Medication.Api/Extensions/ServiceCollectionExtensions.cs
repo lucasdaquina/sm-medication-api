@@ -1,5 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using SM.Medication.Shared.Options;
+using SmartMed.Medication.Auth.Constants;
 
 namespace SM.Medication.Api.Extensions;
 
@@ -20,27 +21,22 @@ public static class ServiceCollectionExtensions
         {
             Name = "Authorization",
             Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer",
+            Scheme = AuthSchemeConstants.SmartMedAuthScheme,
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "JSON Web Token based security",
+            Description = "JSON Web Token based security"
         };
 
-        var securityReq = new OpenApiSecurityRequirement()
+        var securityRequirement = new OpenApiSecurityRequirement();
+        var secondSecurityDefinition = new OpenApiSecurityScheme
         {
+            Reference = new OpenApiReference
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
+                Type = ReferenceType.SecurityScheme,
+                Id = AuthSchemeConstants.SmartMedAuthScheme
             }
         };
-
+        securityRequirement.Add(secondSecurityDefinition, []);
 
         var info = new OpenApiInfo()
         {
@@ -50,13 +46,13 @@ public static class ServiceCollectionExtensions
             TermsOfService = new Uri("https://www.smartmed.world"),
         };
 
+
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", info);
-            c.AddSecurityDefinition("Bearer", securityScheme);
+            c.AddSecurityDefinition(AuthSchemeConstants.SmartMedAuthScheme, securityScheme);
+            c.AddSecurityRequirement(securityRequirement);
         });
     }
-
-
 }

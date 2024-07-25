@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using SM.Medication.Auth.Models;
 using SM.Medication.Auth.Options;
-using SM.Medication.Shared.Options;
 using SmartMed.Medication.Auth.Constants;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace SM.Medication.Auth;
 
@@ -19,11 +19,9 @@ namespace SM.Medication.Auth;
 /// Handles authentication for the medication application.
 /// </summary>
 public class SmartMedAuthenticationHandler(
-        IOptions<MedicationOptions> medicalOptions,
         IOptionsMonitor<SMAuthSchemeOptions> options,
         ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock) : AuthenticationHandler<SMAuthSchemeOptions>(options, logger, encoder, clock)
+        UrlEncoder encoder) : AuthenticationHandler<SMAuthSchemeOptions>(options, logger, encoder)
 {
     private const string COMPUTERUID_SHA256_REGEX = "[A-Fa-f0-9]{64}";
 
@@ -33,28 +31,28 @@ public class SmartMedAuthenticationHandler(
     /// <returns>The authentication result.</returns>
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!base.Request.Headers.ContainsKey(HeaderNames.Authorization))
+        if (!Request.Headers.TryGetValue(HeaderNames.Authorization, out var authorization))
         {
             return await ProcessAuthFailure("Auth header not found.");
         }
 
-        var match = TokenValidator.Match(base.Request.Headers[HeaderNames.Authorization].ToString());
+        var match = TokenValidator.Match(authorization.ToString());
         if (!match.Success)
         {
             return await ProcessAuthFailure("Invalid token provided");
         }
 
-        var value = match.Groups["token"].Value;
+        var tokenValue = match.Groups["token"].Value;
         TokenModel tokenModel;
         try
         {
-            var bytes = Convert.FromBase64String(value);
+            var bytes = Convert.FromBase64String(tokenValue);
             var @string = Encoding.UTF8.GetString(bytes);
             tokenModel = JsonSerializer.Deserialize<TokenModel>(@string);
         }
         catch (Exception ex)
         {
-            base.Logger.LogError("Exception occured while deserializing: " + ex);
+            base.Logger.LogError("Exception occured while deserializing: {Exception}", ex);
             return await ProcessAuthFailure("TokenParseException");
         }
 
@@ -71,20 +69,19 @@ public class SmartMedAuthenticationHandler(
                 new AuthenticationTicket(
                     new ClaimsPrincipal(
                         new ClaimsIdentity(
-                            new Claim[2]
-                            {
-                                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid", tokenModel.Token),
-                                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role", tokenModel.Role),
-                            },
+                            [
+                                new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid", tokenModel.Token),
+                                new("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role", tokenModel.Role),
+                            ],
                             AuthSchemeConstants.SmartMedAuthScheme)
                         ),
                     base.Scheme.Name)));
     }
 
-
     private async Task<AuthenticateResult> ProcessAuthFailure(string failureMessage)
     {
-        base.Response.Headers.Append(new KeyValuePair<string, StringValues>(AuthSchemeConstants.SmartMedAuthFailureHeader, failureMessage));
+        base.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        base.Response.Headers.Add(new KeyValuePair<string, StringValues>(AuthSchemeConstants.SmartMedAuthFailureHeader, failureMessage));
         return await Task.FromResult(AuthenticateResult.Fail(failureMessage));
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SM.Medication.Shared.Options;
+namespace SM.Medication.Shared.Options;
 public class MedicationOptions
 {
     public const string Name = "Medication";
