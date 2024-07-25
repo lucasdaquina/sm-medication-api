@@ -3,6 +3,7 @@ using SM.Medication.Auth;
 using SM.Medication.Auth.Extensions;
 using SM.Medication.Auth.Options;
 using SmartMed.Medication.Auth.Constants;
+using Swashbuckle.AspNetCore.Annotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,15 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!").RequireAuthorization();
+app.MapGet("/",
+    [SwaggerOperation(
+        Summary = "Base Get",
+        Description = "Base Get Endpoint")]
+    [SwaggerResponse(200, "Success!")]
+    [SwaggerResponse(401, "You're not Authorized!")]
+    [SwaggerResponse(500, "Failed!")]
+    () 
+        => "Hello World!").RequireAuthorization();
 
 if (app.Environment.IsDevelopment())
 {

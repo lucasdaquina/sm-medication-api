@@ -48,11 +48,12 @@ public static class ServiceCollectionExtensions
 
 
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(action =>
         {
-            c.SwaggerDoc("v1", info);
-            c.AddSecurityDefinition(AuthSchemeConstants.SmartMedAuthScheme, securityScheme);
-            c.AddSecurityRequirement(securityRequirement);
+            action.SwaggerDoc("v1", info);
+            action.AddSecurityDefinition(AuthSchemeConstants.SmartMedAuthScheme, securityScheme);
+            action.AddSecurityRequirement(securityRequirement);
+            action.EnableAnnotations();
         });
     }
 }
