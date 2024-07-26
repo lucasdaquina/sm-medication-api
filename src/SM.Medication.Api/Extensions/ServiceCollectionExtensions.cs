@@ -1,10 +1,7 @@
-using Microsoft.OpenApi.Models;
 using SM.Medication.Application.Handlers;
-using SM.Medication.Application.Interfaces;
 using SM.Medication.Domain.Interfaces;
 using SM.Medication.Infrastructure.Services.Repositories;
 using SM.Medication.Shared.Options;
-using SmartMed.Medication.Auth.Constants;
 
 namespace SM.Medication.Api.Extensions;
 

@@ -1,8 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using SM.Medication.Application.Interfaces;
-using SM.Medication.Infrastructure.Persistence;
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace SM.Medication.Api.EndPoints;
 
 public static class MedicationEndPoints
@@ -10,7 +5,7 @@ public static class MedicationEndPoints
     private const string MEDICATION_TAG = "Medication";
     public static void MapMedicationEndPoints(this WebApplication app)
     {
-        app.MapGet("/medications", 
+        app.MapGet("/medications",
             async (IMedicationHandler handler) =>
             {
                 return await handler.Handle();

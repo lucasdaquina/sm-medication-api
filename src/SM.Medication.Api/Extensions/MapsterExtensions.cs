@@ -1,6 +1,6 @@
+using System.Reflection;
 using Mapster;
 using MapsterMapper;
-using System.Reflection;
 
 namespace SM.Medication.Api.Extensions;
 

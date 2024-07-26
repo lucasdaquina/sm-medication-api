@@ -1,5 +1,4 @@
 using Microsoft.OpenApi.Models;
-using SmartMed.Medication.Auth.Constants;
 
 namespace SM.Medication.Api.Extensions;
 

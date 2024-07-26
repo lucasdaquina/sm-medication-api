@@ -5,14 +5,13 @@ using SM.Medication.Auth;
 using SM.Medication.Auth.Extensions;
 using SM.Medication.Auth.Options;
 using SM.Medication.Infrastructure.Persistence;
-using SmartMed.Medication.Auth.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddOptions();
 builder.Services.AddCors(options => options.AddPolicy("allowAny", o => o.AllowAnyOrigin()));
 
-builder.Services.SetupOpenApi();
+builder.SetupOpenApi();
 
 builder.Services.AddDbContext<SmartMedMedicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MedicationDb")));
