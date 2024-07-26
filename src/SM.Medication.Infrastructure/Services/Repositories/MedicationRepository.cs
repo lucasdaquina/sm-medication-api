@@ -5,13 +5,20 @@ namespace SM.Medication.Infrastructure.Services.Repositories;
 
 public class MedicationRepository(SmartMedMedicationDbContext context) : IMedicationRepository
 {
-    public async Task<bool> Add(Domain.Entities.Medication entity)
+    public async Task<int> Add(Domain.Entities.Medication entity)
     {
         context.Medications.Add(entity);
 
-        var result = await context.SaveChangesAsync();
+        return await context.SaveChangesAsync();
+    }
 
-        return result > 0;
+    public async Task<int> Delete(string name)
+    {
+        var medication = await GetByName(name) ?? throw new Exception("Medication not found.");
+
+        context.Medications.Remove(medication!);
+
+        return await context.SaveChangesAsync();
     }
 
     public async Task<List<Domain.Entities.Medication>> GetAll()
