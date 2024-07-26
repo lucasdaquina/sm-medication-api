@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SM.Medication.Application\SM.Medication.Application.csproj" />
     <ProjectReference Include="..\SM.Medication.Auth\SM.Medication.Auth.csproj" />
+    <ProjectReference Include="..\SM.Medication.Infrastructure\SM.Medication.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
