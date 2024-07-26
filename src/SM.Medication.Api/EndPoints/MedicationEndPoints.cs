@@ -46,7 +46,7 @@ public static class MedicationEndPoints
     {
         return builder.WithTags(MEDICATION_TAG)
             .WithMetadata(new SwaggerOperationAttribute(MEDICATION_TAG, description))
-            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status201Created, "Success!"))
+            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status201Created, "Created!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status400BadRequest, "Bad Request!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status401Unauthorized, "You're not Authorized!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status500InternalServerError, "Failed!"))

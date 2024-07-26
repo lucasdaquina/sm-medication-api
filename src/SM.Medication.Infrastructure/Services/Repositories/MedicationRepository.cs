@@ -25,6 +25,6 @@ public class MedicationRepository(SmartMedMedicationDbContext context) : IMedica
     {
         return await context
              .Medications
-             .FirstOrDefaultAsync(x => x.Name!.ToUpperInvariant().Trim() == name.ToUpperInvariant().Trim());
+             .FirstOrDefaultAsync(med => string.Equals(med.Name!.ToUpper(), name.ToUpper()));
     }
 }
