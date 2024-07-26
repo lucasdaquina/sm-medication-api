@@ -1,4 +1,3 @@
-using System.Runtime.Versioning;
 using SM.Medication.Api.Extensions;
 using SM.Medication.Application.Commands;
 
@@ -12,18 +11,33 @@ public static class MedicationEndPoints
         app.MapGet("/medications",
             async (IMedicationHandler handler) =>
             {
-                return await handler.Handle();
-            }).AddMetadata("Get List of Medications");
+                try
+                {
+                    var result = await handler.Handle();
+
+                    return Results.Ok(result);
+                }
+                catch (Exception e)
+                {
+                    //Log specific exception
+                    return Results.Problem(
+                        e.Message,
+                        statusCode: StatusCodes.Status500InternalServerError);
+                }
+
+            })
+            .AddMetadata("Get List of Medications")
+            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status200OK, "Success!"));
 
 
         app.MapPost("/medications",
-            async (IMedicationHandler handler, CreateMedicationCommand request) =>
+            async (IMedicationHandler handler, CreateMedicationCommand command) =>
             {
                 try
                 {
-                    request.Name.GuardString(nameof(request.Name));
+                    command.Name.GuardString(nameof(command.Name));
 
-                    var result = await handler.Handle(request);
+                    var result = await handler.Handle(command);
                     if (!result)
                         return Results.Problem(
                             "Failed to create Medication",
@@ -38,15 +52,43 @@ public static class MedicationEndPoints
                         e.Message,
                         statusCode: StatusCodes.Status500InternalServerError);
                 }
-            }).AddMetadata("Create Medication");
+            })
+            .AddMetadata("Create Medication")
+            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status201Created, "Created!"));
 
+        app.MapDelete("/medications/{medicationName}",
+            async (string medicationName, IMedicationHandler handler) =>
+            {
+                try
+                {
+                    medicationName.GuardString(nameof(medicationName));
+
+                    var command = new DeleteMedicationCommand { Name = medicationName };
+
+                    var result = await handler.Handle(command);
+                    if (!result)
+                        return Results.Problem(
+                            "Failed to delete Medication",
+                            statusCode: StatusCodes.Status500InternalServerError);
+
+                    return Results.NoContent();
+                }
+                catch (Exception e)
+                {
+                    //Log specific exception
+                    return Results.Problem(
+                        e.Message,
+                        statusCode: StatusCodes.Status500InternalServerError);
+                }
+            })
+            .AddMetadata("Delete Medication")
+            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status204NoContent, "Deleted!")); ;
     }
 
     public static RouteHandlerBuilder AddMetadata(this RouteHandlerBuilder builder, string description)
     {
         return builder.WithTags(MEDICATION_TAG)
             .WithMetadata(new SwaggerOperationAttribute(MEDICATION_TAG, description))
-            .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status201Created, "Created!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status400BadRequest, "Bad Request!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status401Unauthorized, "You're not Authorized!"))
             .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status500InternalServerError, "Failed!"))

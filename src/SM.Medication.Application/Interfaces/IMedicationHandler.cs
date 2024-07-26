@@ -5,4 +5,6 @@ public interface IMedicationHandler
 {
     Task<List<MedicationDTO>> Handle();
     Task<bool> Handle(CreateMedicationCommand command);
+    Task<bool> Handle(DeleteMedicationCommand command);
+
 }

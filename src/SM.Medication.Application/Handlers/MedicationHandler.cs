@@ -33,6 +33,13 @@ public class MedicationHandler(
         if (!isMedicationExist)
             throw new Exception("Medication already exist.");
 
-        return await medicationRepository.Add(entity);
+        var result = await medicationRepository.Add(entity);
+        return result > 0;
+    }
+
+    public async Task<bool> Handle(DeleteMedicationCommand command)
+    {
+        var result = await medicationRepository.Delete(command.Name!);
+        return result > 0;
     }
 }
