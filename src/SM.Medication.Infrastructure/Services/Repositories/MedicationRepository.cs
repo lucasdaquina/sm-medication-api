@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using SM.Medication.Domain.Interfaces;
 using SM.Medication.Infrastructure.Persistence;
 

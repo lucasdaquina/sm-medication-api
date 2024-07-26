@@ -1,6 +1,5 @@
 using MapsterMapper;
 using SM.Medication.Application.Interfaces;
-using SM.Medication.Domain.DTO;
 using SM.Medication.Domain.Interfaces;
 
 namespace SM.Medication.Application.Handlers;
@@ -12,6 +11,6 @@ public class MedicationHandler(
     public async Task<List<MedicationDTO>> Handle()
     {
         var medications = await medicationRepository.GetAll();
-        return mapper.Map<List<MedicationDTO>>(medications); 
+        return mapper.Map<List<MedicationDTO>>(medications);
     }
 }
