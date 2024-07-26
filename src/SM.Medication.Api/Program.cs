@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using SM.Medication.Api.Extensions;
 using SM.Medication.Auth;
@@ -25,19 +27,33 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!")
-    .WithTags("Home")
-    .WithMetadata(new SwaggerOperationAttribute("Home", "Base Get Endpoint"))
-    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status200OK, "Success!"))
-    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status401Unauthorized, "You're not Authorized!"))
-    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status500InternalServerError, "Failed!"))
-    .RequireAuthorization();
+//var supportedCultures = new[]
+//{
+// new CultureInfo("en-US"),
+// new CultureInfo("fr"),
+//};
+//app.UseRequestLocalization(new RequestLocalizationOptions
+//{
+//    DefaultRequestCulture = new RequestCulture("en-US"),
+//    // Formatting numbers, dates, etc.
+//    SupportedCultures = supportedCultures,
+//    // UI strings that we have localized.
+//    SupportedUICultures = supportedCultures
+//});
+
+app.MapGet("/", () => "Hello World!");
+    
 
 app.MapGet("/medications", async (SmartMedMedicationDbContext dbContext) =>
 {
     var medications = await dbContext.Medications.ToListAsync();
     return medications;
-});
+}).WithTags("Home")
+    .WithMetadata(new SwaggerOperationAttribute("Home", "Base Get Endpoint"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status200OK, "Success!"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status401Unauthorized, "You're not Authorized!"))
+    .WithMetadata(new SwaggerResponseAttribute(StatusCodes.Status500InternalServerError, "Failed!"))
+    .RequireAuthorization(); ;
 
 if (app.Environment.IsDevelopment())
 {
