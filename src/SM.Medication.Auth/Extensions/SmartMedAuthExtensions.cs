@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 namespace SM.Medication.Auth.Extensions;
 
 public static class SmartMedAuthExtensions

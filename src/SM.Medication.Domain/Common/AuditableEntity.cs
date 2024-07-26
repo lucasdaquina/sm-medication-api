@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Http;
-
 namespace SM.Medication.Domain.Common;
+
 public class AuditableEntity
 {
     public string? CreatedBy { get; set; }
