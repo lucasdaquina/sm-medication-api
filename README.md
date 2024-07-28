@@ -12,6 +12,7 @@ Steps to run api:
     - On VisualStudio click Tools -> NuGet Package Manager -> Package Manager Console
     - Select the "Default project" as "src\Application"
     - run the command dotnet ef database update --project .\src\SM.Medication.Infrastructure\SM.Medication.Infrastructure.csproj --startup-project .\src\SM.Medication.Api\SM.Medication.Api.csproj"
+5. Select SM.Medication.API Project as startup and run https.
 
 Now the Solution is ready, with a base SQL Server DB running with 3 medications on the medication table already.
 
